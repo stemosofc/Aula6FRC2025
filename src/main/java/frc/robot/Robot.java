@@ -4,8 +4,7 @@
 
 package frc.robot;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -25,16 +24,11 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   // Objeto de motor Spark Max
-  CANSparkMax motor = new CANSparkMax(0, null);
-
-  // Encoder interno do NEO
-  RelativeEncoder encoder;
-
-  // Diâmetro da nossa roda
-  private static final double DIAMETRO_RODA = 1;
+  SparkMax motor = new SparkMax(0, null);
 
   // Objeto que conta o tempo decorrido
   Timer timer = new Timer();
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -44,15 +38,6 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-
-    // Atribuimos o objeto do motor integrado
-    encoder = motor.getEncoder();
-
-    // Resetamos sua posição para 0
-    encoder.setPosition(0);
-
-    // Definimos um fator de conversão que será multiplicado pela unidade nativa do encoder
-    encoder.setPositionConversionFactor(Math.PI * DIAMETRO_RODA / encoder.getCountsPerRevolution());
   }
 
   /**
@@ -80,7 +65,6 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
-
     timer.start();
   }
 
@@ -91,19 +75,6 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     switch (m_autoSelected) {
       case kCustomAuto:
-      // Aqui retornamos a posição atual do encoder
-        double posicao = encoder.getPosition();
-        // Colocamos seu valor na shuffleboard
-        SmartDashboard.putNumber("Posição encoder", posicao);
-        // Se for o primeiro movimento acessamos o primeiro if
-        if(contador == 0) {
-          // acionamos o motor até a posição ser 20
-          acionaMotor(20, posicao, 0.4);
-        }
-        // Se for o segundo movimento queremos que o contador seja 1
-        if(contador == 1) {
-          acionaMotor(40, posicao, 0.5);
-        } 
         break;
       case kDefaultAuto:
         // Retornamos o valor do tempo
